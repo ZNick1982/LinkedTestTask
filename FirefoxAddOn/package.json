@@ -1,0 +1,16 @@
+{
+  "title": "Liked test addon",
+  "name": "testaddon",
+  "version": "0.0.1",
+  "description": "youtube addon",
+  "main": "index.js",
+  "author": "Nikolay Zherdev",
+  "engines": {
+    "firefox": ">=38.0a1",
+    "fennec": ">=38.0a1"
+  },
+  "license": "MIT",
+  "keywords": [
+    "jetpack"
+  ]
+}
