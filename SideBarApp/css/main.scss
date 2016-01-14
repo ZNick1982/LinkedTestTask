@@ -1,0 +1,18 @@
+$hdrHeight: 10rem;
+
+.search-block{
+    height: $hdrHeight;
+    position: fixed;
+    top: 1rem;
+    width: 100%;
+}
+
+.result-block{
+    position: absolute;
+    top: $hdrHeight;
+    height: calc(100% - #{$hdrHeight});
+    max-height: calc(100% - #{$hdrHeight});
+    overflow-y: auto;
+    width: 100%;
+}
+

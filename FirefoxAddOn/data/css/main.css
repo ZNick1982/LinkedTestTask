@@ -1,0 +1,13 @@
+.search-block {
+  height: 10rem;
+  position: fixed;
+  top: 1rem;
+  width: 100%; }
+
+.result-block {
+  position: absolute;
+  top: 10rem;
+  height: calc(100% - 10rem);
+  max-height: calc(100% - 10rem);
+  overflow-y: auto;
+  width: 100%; }

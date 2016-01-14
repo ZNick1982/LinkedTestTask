@@ -2,6 +2,7 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var bower = require('gulp-bower');
 var browserify = require('browserify');
+var sass = require('gulp-sass');
 
 var source = require('vinyl-source-stream');
 var buffer = require('vinyl-buffer');
@@ -11,6 +12,12 @@ var buffer = require('vinyl-buffer');
 // Copy HTML and CSS
 gulp.task('markup', function() {
     return gulp.src('./SideBarApp/index.html').pipe(gulp.dest('./FirefoxAddOn/data/'));
+});
+
+gulp.task('sass', function () {
+  gulp.src('./SideBarApp/css/*.scss')
+    .pipe(sass().on('error', sass.logError))
+    .pipe(gulp.dest('./FirefoxAddOn/data/css'));
 });
 
 
@@ -28,8 +35,13 @@ function createTask(srcPath, entryPoint, destPath){
     }
 }
 
-gulp.task('buildSideBar', ['markup'], createTask('./SideBarApp/', 'sideBarApp.js', './FirefoxAddOn/data/'));
+gulp.task('buildSideBar', ['markup', 'sass'], createTask('./SideBarApp/js/', 'sideBarApp.js', './FirefoxAddOn/data/'));
 gulp.task('buildInjectApp',  createTask('./InjectApp/', 'injectApp.js', './FirefoxAddOn/data/'));
 
-gulp.task('build', ['markup', 'buildSideBar', 'buildInjectApp']);
+gulp.task('build', ['buildSideBar', 'buildInjectApp']);
+
+gulp.task('watch', function () {
+  gulp.watch(['./SideBarApp/css/**/*.scss', './SideBarApp/**/*.html', '/SideBarApp/**/*.js'], ['buildSideBar']);
+  gulp.watch(['./InjectApp/**/*.js'], ['buildInjectApp']);
+});
 

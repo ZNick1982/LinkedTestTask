@@ -58,7 +58,7 @@ module.exports = ['$rootScope', function($rootScope){
 },{}],5:[function(require,module,exports){
 'use strict';
 
-require("./../bower_components/angular/angular.js");
+require("./../../bower_components/angular/angular.js");
 
 
 
@@ -72,7 +72,7 @@ app.run(require('./configs/run.js'));
 
 
 
-},{"./../bower_components/angular/angular.js":6,"./configs/run.js":1,"./controllers/searchController.js":2,"./controllers/searchResultController.js":3,"./services/searchResultService.js":4}],6:[function(require,module,exports){
+},{"./../../bower_components/angular/angular.js":6,"./configs/run.js":1,"./controllers/searchController.js":2,"./controllers/searchResultController.js":3,"./services/searchResultService.js":4}],6:[function(require,module,exports){
 /**
  * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org

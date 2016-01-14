@@ -4,10 +4,11 @@
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <link href="css/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link href="css/main.css" type="text/css" rel="stylesheet">
 </head>
 <body>
     <div class="container">
-        <div class="row" ng-controller="searchController as sc">
+        <div class="row search-block" ng-controller="searchController as sc">
             <div class="col-md-12">
                 <div class="form-group">
                     <input type="text" class="form-control" ng-model="sc.searchModel"/>
@@ -17,7 +18,7 @@
                 <button class="btn btn-primary btn-block" ng-click="sc.onSearchClick()">Поиск</button>
             </div>
         </div>
-        <div class="row" ng-controller="searchResultController as src">
+        <div class="row result-block" ng-controller="searchResultController as src">
             <div class="col-md-12" ng-repeat="l in src.sResultService.resultList | orderBy:'-rank'">
                 Rank - {{l.rank}} <a href="{{l.url}}">{{l.text}}</a>
             </div>
