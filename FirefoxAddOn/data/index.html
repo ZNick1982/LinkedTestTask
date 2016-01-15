@@ -7,20 +7,27 @@
     <link href="css/main.css" type="text/css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <div class="row search-block" ng-controller="searchController as sc">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <input type="text" class="form-control" ng-model="sc.searchModel"/>
+    <div class="search-block">
+        <div class="container">
+            <div class="row" ng-controller="searchController as sc">
+                <div class="col-md-12 col-lg-12">
+                    <div class="form-group">
+                        <input type="text" class="form-control" ng-model="sc.searchModel"
+                        a-complete/>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <button class="btn btn-primary btn-block" ng-click="sc.onSearchClick()">Поиск</button>
                 </div>
             </div>
-            <div class="col-md-12">
-                <button class="btn btn-primary btn-block" ng-click="sc.onSearchClick()">Поиск</button>
-            </div>
         </div>
-        <div class="row result-block" ng-controller="searchResultController as src">
-            <div class="col-md-12" ng-repeat="l in src.sResultService.resultList | orderBy:'-rank'">
-                Rank - {{l.rank}} <a href="{{l.url}}">{{l.text}}</a>
+    </div>
+    <div class="result-block">
+        <div class="container">
+            <div class="row" ng-controller="searchResultController as src">
+                <div class="col-md-12" ng-repeat="l in src.sResultService.resultList | orderBy:'-rank'">
+                    Rank - {{l.rank}} <a href="http://youtube.com{{l.url}}" target="_blank">{{l.text}}</a>
+                </div>
             </div>
         </div>
     </div>

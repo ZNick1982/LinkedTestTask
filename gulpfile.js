@@ -40,8 +40,10 @@ gulp.task('buildInjectApp',  createTask('./InjectApp/', 'injectApp.js', './Firef
 
 gulp.task('build', ['buildSideBar', 'buildInjectApp']);
 
-gulp.task('watch', function () {
-  gulp.watch(['./SideBarApp/css/**/*.scss', './SideBarApp/**/*.html', '/SideBarApp/**/*.js'], ['buildSideBar']);
-  gulp.watch(['./InjectApp/**/*.js'], ['buildInjectApp']);
+gulp.task('watch', ['buildSideBar', 'buildInjectApp'], function () {
+  gulp.watch('./SideBarApp/css/**/*.scss',['buildSideBar']); 
+  gulp.watch('./SideBarApp/**/*.html', ['buildSideBar']);
+  gulp.watch('./SideBarApp/**/*.js', ['buildSideBar']);
+  gulp.watch('./InjectApp/**/*.js', ['buildInjectApp']);
 });
 

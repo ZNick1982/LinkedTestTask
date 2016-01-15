@@ -1,39 +1,267 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-module.exports = ['searchResultService', '$rootScope', function(searchResultService, $rootScope){
+require("./../../../bower_components/angular/angular.js");
+
+var storage = require('./storage.js');
+
+var Autocomplete = function(elem){
     
-    addon.port.on('onAddLink', function(data){
-        console.log('Sidebar got message onAddLink');
-        searchResultService.add(data);
-        $rootScope.$apply();
+    var element = angular.element(elem);
+    var onSelectHandlers = [];
+    
+    var clickInProcess = false;
+    
+    var acContainer = angular.element(document.createElement('div'));
+    acContainer.css('position', 'absolute');
+    acContainer.css('display', 'none');
+    
+    var body = angular.element(document.body);
+        
+    body.append(acContainer);
+    
+    element.on('input', tryAutocomplete);
+    element.on('focus', tryAutocomplete);
+    
+    element.on('click', function(event){
+        event.stopPropagation();
     });
     
-}]
-},{}],2:[function(require,module,exports){
+    body.on('click', function(){
+        window.setTimeout(function(){
+            console.log('on body click!!!');
+            if(!clickInProcess){
+                clearDom();
+            }
+        }, 10);
+    });
+    
+    
+    window.addEventListener('resize', function(){
+        recalcPosition();
+    })
+    
+    function tryAutocomplete(event){
+        event.stopPropagation();
+        var inputVal = element.val();
+        console.log('Input changed with val: ' + inputVal);
+        
+        var foundList = findInStorage(inputVal);
+        if(foundList.length && inputVal) {
+            recalcPosition();
+            reGenerateDom(foundList);
+        }
+        else {
+            clearDom();
+        }
+    }
+    
+    
+    function findInStorage(searchVal){
+        
+        var list = storage.read();
+        
+        if(!list){
+            list = [];
+        }
+        
+        var resList = list.filter(function(item){
+            return item.indexOf(searchVal) > -1;
+        });
+        return resList;
+        
+    }
+    
+    function reGenerateDom(itemList){
+        clearDom();
+        if(itemList.length){
+            
+            acContainer.css('display', 'block');
+            
+            var ulElem = angular.element(document.createElement('div'));
+            ulElem.addClass('list-group');
+            itemList.forEach(function(text){
+                var liElem = angular.element(document.createElement('a'));
+                liElem.text(text);
+                liElem.addClass('list-group-item');
+                liElem.attr('href', 'javascript:{}');
+                liElem.on('click', onClickHandler);
+                ulElem.append(liElem);
+            });
+            acContainer.append(ulElem);
+        }
+    }
+    
+    function clearDom(){
+        clickInProcess = false;
+        acContainer.html('');
+        acContainer.css('display', 'none');
+    }
+    
+    function recalcPosition(){
+        var elemRect = element[0].getBoundingClientRect();
+        acContainer.css('top', (elemRect.bottom + 1)+'px');
+        acContainer.css('left', elemRect.left + 'px');
+        acContainer.css('width', elemRect.width + 'px');
+    }
+    
+    
+    function onClickHandler(){
+        clickInProcess = true;
+        console.log('on click !!!');
+        var thisItem = angular.element(this);
+        var text = thisItem.text();
+        onSelectHandlers.forEach(function(handler){
+            handler(text);
+        });
+        
+        clearDom();
+
+    }
+    
+    
+    this.onSelect = function(handler){
+        if(handler){
+            onSelectHandlers.push(handler);
+        }
+    }
+}
+
+module.exports = Autocomplete;
+
+
+},{"./../../../bower_components/angular/angular.js":9,"./storage.js":2}],2:[function(require,module,exports){
 'use strict';
 
-module.exports = ['$scope', 'searchResultService', function($scope, searchResultService){
+var storageName = 'autocompleteStorage';
+
+module.exports = {
+    read: function(){
+        
+        var val = localStorage.getItem(storageName);
+        if(val){
+            val = JSON.parse(val);
+        } 
+        return val;
+    },
+    
+    add: function(item){
+        var isExist = false;
+        
+        var savedList = this.read();
+        if(!savedList){
+            savedList = [];
+        }
+        
+        savedList.forEach(function(text){
+            if(text === item){
+                isExist = true;
+            }
+        });
+        
+        if(!isExist){
+            savedList.push(item);
+            localStorage.setItem(storageName, JSON.stringify(savedList));
+        }
+        return;
+    }
+};
+
+
+},{}],3:[function(require,module,exports){
+'use strict';
+
+module.exports = ['searchResultService', '$rootScope', '$log', '$timeout', 
+    function(searchResultService, $rootScope, $log, $timeout){
+    try{
+        addon.port.on('onAddLink', function(data){
+            searchResultService.add(data);
+            $rootScope.$apply();
+        });
+    }
+    catch(ex){
+        $log.error("Exception in configs/run.js");
+        $log.error(ex.message);
+        
+        var addTestData = function(){
+            $timeout(function(){
+                searchResultService.add(
+                    {
+                        rank: Math.floor((Math.random() * 10) + 1),
+                        url: 'http://www.google.com',
+                        text: 'Test link ' + Math.floor((Math.random() * 10) + 1)
+                    });
+               addTestData();
+            }, 1000);
+        }
+        
+        var clearTestData = function(){
+            $timeout(function(){
+                searchResultService.clear();
+                clearTestData();
+            }, 60000);
+        }
+        
+        addTestData();
+        clearTestData();
+    }     
+}];
+},{}],4:[function(require,module,exports){
+'use strict';
+
+var storage = require('../classes/storage.js');
+
+module.exports = ['$scope', 'searchResultService', '$log', function($scope, searchResultService, $log){
     
     var self = this;
     
     self.searchModel = '';
     
     self.onSearchClick = function(){
-        console.log('Search button clicked with text: ' + self.searchModel);
-        addon.port.emit('onSearch', self.searchModel);
+        $log.debug('Search button clicked with text: ' + self.searchModel);
+        try {
+            addon.port.emit('onSearch', self.searchModel);
+        }
+        catch(ex){
+            $log.error("Exception in controllers/searchController.js");
+            $log.error(ex.message);   
+        }
+        storage.add(self.searchModel);
         searchResultService.clear();
-    }
-    
+    }    
 }];
-},{}],3:[function(require,module,exports){
+},{"../classes/storage.js":2}],5:[function(require,module,exports){
 'use strict';
 
 module.exports = ['$scope', 'searchResultService', function($scope, searchResultService){
     var self = this;
     self.sResultService = searchResultService
 }];
-},{}],4:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
+'use strict';
+
+var Autocomplete = require('../classes/autocomplete.js');
+
+module.exports = [function(){
+    return {
+            restrict: 'A',
+            require: 'ngModel',
+            link: function (scope, element, attrs, ngModel) 
+            {
+                   var ac = new Autocomplete(element);
+                   ac.onSelect(function(selectedValue){
+                        console.log("click from directive with val: " + selectedValue);
+                        ngModel.$viewValue = selectedValue;
+//                        ngModel.$modelValue = selectedValue;
+//                        scope.ngModel = selectedValue;
+                        ngModel.$render();
+//                        scope.$apply();
+                        
+                   });   
+            }
+        };
+}];
+},{"../classes/autocomplete.js":1}],7:[function(require,module,exports){
 'use strict';
 
 module.exports = ['$rootScope', function($rootScope){
@@ -55,7 +283,7 @@ module.exports = ['$rootScope', function($rootScope){
     
     return service;
 }];
-},{}],5:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 'use strict';
 
 require("./../../bower_components/angular/angular.js");
@@ -66,13 +294,14 @@ var app = angular.module('sideBarApp', []);
 app.controller('searchController', require('./controllers/searchController.js'));
 app.controller('searchResultController', require('./controllers/searchResultController.js'));
 app.factory('searchResultService', require('./services/searchResultService.js'));
+app.directive('aComplete', require('./directives/aComplete.js'));
 app.run(require('./configs/run.js'));
 
 
 
 
 
-},{"./../../bower_components/angular/angular.js":6,"./configs/run.js":1,"./controllers/searchController.js":2,"./controllers/searchResultController.js":3,"./services/searchResultService.js":4}],6:[function(require,module,exports){
+},{"./../../bower_components/angular/angular.js":9,"./configs/run.js":3,"./controllers/searchController.js":4,"./controllers/searchResultController.js":5,"./directives/aComplete.js":6,"./services/searchResultService.js":7}],9:[function(require,module,exports){
 /**
  * @license AngularJS v1.4.8
  * (c) 2010-2015 Google, Inc. http://angularjs.org
@@ -29091,4 +29320,4 @@ $provide.value("$locale", {
 })(window, document);
 
 !window.angular.$$csp().noInlineStyle && window.angular.element(document.head).prepend('<style type="text/css">@charset "UTF-8";[ng\\:cloak],[ng-cloak],[data-ng-cloak],[x-ng-cloak],.ng-cloak,.x-ng-cloak,.ng-hide:not(.ng-hide-animate){display:none !important;}ng\\:form{display:block;}.ng-animate-shim{visibility:hidden;}.ng-anchor{position:absolute;}</style>');
-},{}]},{},[5]);
+},{}]},{},[8]);

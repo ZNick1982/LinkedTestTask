@@ -2,16 +2,16 @@ $hdrHeight: 10rem;
 
 .search-block{
     height: $hdrHeight;
-    position: fixed;
-    top: 1rem;
-    width: 100%;
+//    position: fixed;
+    margin-top: 1rem;
+//    width: 100%;
 }
 
 .result-block{
     position: absolute;
-    top: $hdrHeight;
-    height: calc(100% - #{$hdrHeight});
-    max-height: calc(100% - #{$hdrHeight});
+    top: $hdrHeight + 1rem;
+    height: calc(100% - #{$hdrHeight} - 1rem);
+    max-height: calc(100% - #{$hdrHeight} - 1rem);
     overflow-y: auto;
     width: 100%;
 }

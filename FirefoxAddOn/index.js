@@ -1,3 +1,7 @@
+'use strict';
+
+(function(){
+
 var self = require('sdk/self');
 var buttons = require('sdk/ui/button/action');
 var tabs = require("sdk/tabs");
@@ -52,3 +56,5 @@ function runScript(tab) {
 }
 
 console.log('addon started!!!');
+
+})();
