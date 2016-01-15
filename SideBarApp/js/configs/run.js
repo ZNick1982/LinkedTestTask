@@ -7,6 +7,8 @@ module.exports = ['searchResultService', '$rootScope', '$log', '$timeout',
             searchResultService.add(data);
             $rootScope.$apply();
         });
+        
+        addon.port.emit('onAppStarted');
     }
     catch(ex){
         $log.error("Exception in configs/run.js");

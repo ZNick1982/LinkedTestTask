@@ -29,8 +29,29 @@ module.exports = {
         if(!isExist){
             savedList.push(item);
             localStorage.setItem(storageName, JSON.stringify(savedList));
+            
+            try {
+                addon.port.emit('onSave', savedList);
+            }
+            catch(ex){
+                console.log("Exception in classes/storage.js");
+                console.log(ex.message);   
+            }
+            
         }
         return;
     }
 };
+
+
+try {
+    addon.port.on('onRead', function(initArr){
+        console.log('got onRead with: ' + JSON.stringify(initArr));
+        localStorage.setItem(storageName, JSON.stringify(initArr));
+    });
+}
+catch(ex){
+    console.log("Exception in classes/storage.js");
+    console.log(ex.message);   
+}
 

@@ -5,6 +5,7 @@
 var self = require('sdk/self');
 var buttons = require('sdk/ui/button/action');
 var tabs = require("sdk/tabs");
+var ss = require("sdk/simple-storage");
 
 var injectWorker = null;
 var sideWorker = null;
@@ -19,6 +20,15 @@ var sidebar = require("sdk/ui/sidebar").Sidebar({
     worker.port.on('onSearch', function(message) {
         console.log('Add On received onSearch and route it to tab');
         injectWorker.port.emit('onSearch', message);  
+    });
+    worker.port.on('onSave', function(arr){
+        console.log('Add On got onSave message!!!' + JSON.stringify(arr));
+        ss.storage.acData = arr;
+    });
+    
+    worker.port.on('onAppStarted', function(){
+        console.log('Add On got onAppStarted message!!!');
+        worker.port.emit('onRead', ss.storage.acData);  
     });
   }
 });

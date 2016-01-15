@@ -102,7 +102,9 @@ var observer = new MutationObserver(function(mutations) {
     }    
 });
  
-observer.observe(domList, { attributes: false, childList: true, characterData: false });
+if(domList){
+    observer.observe(domList, { attributes: false, childList: true, characterData: false });
+}
 
 })();
  
